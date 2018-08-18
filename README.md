@@ -84,9 +84,8 @@ Aufruf im Browser zur Kontrolle (Portnummer wie beim Start angegeben):
 
     > http://<IP-Adresse oder Domain>:8080/babelweb.html
 
-In der Datei "static/babelweb.html" muss an drei Stellen der Name des
+In der Datei "static/babelweb.html" muss in den Zeilen 5 und 8 der Name des
 Gateways angepasst werden, dort steht als Platzhalter "##default##".
-Siehe dort folgende Zeilen: 5, 8 und 36
 
 
 Extras
