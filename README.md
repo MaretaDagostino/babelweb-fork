@@ -64,6 +64,8 @@ auf eine Stunde gesetzt, weil das Gezappel der Grafik einfach nur nervt.
 
     > vi /etc/systemd/system/babelweb.service
 
+Dateiinhalt:
+
     [Unit]
     Description=Fork of BabelWeb
     [Service]
@@ -72,6 +74,8 @@ auf eine Stunde gesetzt, weil das Gezappel der Grafik einfach nur nervt.
     Type=simple
     [Install]
     WantedBy=multi-user.target
+
+Aktivieren mit:
 
     > systemctl enable babelweb
     > systemctl start babelweb.service
@@ -84,8 +88,8 @@ Aufruf im Browser zur Kontrolle (Portnummer wie beim Start angegeben):
 
     > http://<IP-Adresse oder Domain>:8080/babelweb.html
 
-In der Datei "static/babelweb.html" muss in den Zeilen 5 und 8 der Name des
-Gateways angepasst werden, dort steht als Platzhalter "##default##".
+In der Datei "static/babelweb.html" muss in den Zeilen 5 und 15 der Name des
+Gateways angepasst werden, dort steht ##default## als Platzhalter.
 
 
 Extras
