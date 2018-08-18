@@ -18,7 +18,7 @@ weshalb es aus der Originalquelle installiert werden muss.
 
     apt-get install curl
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-    apt-get install nodejs
+    apt-get install npm
 
 Nun wird das originale BabelWeb 0.4.0 aus NPM installiert.
 
