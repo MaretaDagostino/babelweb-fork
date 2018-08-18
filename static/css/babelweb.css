@@ -1,10 +1,14 @@
+/* Mareta: min-width und max-width ergaenzt */
 body {
-margin: 10px;
+  margin: 10px;
+  min-width: 40em;
+  max-width: 55em;
+  font-family: serif;
 }
 
 .good { background-color: #CAFF70; }
 .bad { background-color: #FF7256; }
-.loading {font-style: italic ; }
+.loading {font-style: italic; }
 
 h2 { clear: both; }
 
@@ -17,10 +21,18 @@ h2 { clear: both; }
 td, th { font-family: monospace; padding: 0 1ex 0 1ex;}
 td { white-space: nowrap; }
 
-/* Avoid break between legend dot and text */
-p.legend span { float: left; display: block; }
-.legend-title { font-weight: bold; margin-right: 1em; }
-.legend-dot { margin: 0 1ex 0 1ex; }
+/* Mareta: Legenden mit Punkten vorne */
+table#legend th {
+  font-family: sans-serif; padding: 0 1ex 0 1ex;
+  text-align: left;
+}
+table#legend td {
+  font-family: serif; padding: 0 1ex 0 1ex;
+}
+table#legend td:nth-child(1) {
+  font-family: monospace;
+}
+table#legend tr:hover { opacity: 1.0; }
 
 #route td:nth-child(2) { text-align: right; }
 #route td:nth-child(3) { text-align: right; }
@@ -44,3 +56,13 @@ tr {
   -ms-transition: background-color 1s;
   transition: background-color 1s;
 }
+
+/* Mareta: Darstellung der Auswahlbox und der Loggarithmic Checkbox unterdruecken.
+   Sie koennen nicht ganz entfernt werden, weil da Logik von Babelweb dranhaengt. */
+select#nodes {
+  display: none;
+}
+input#logscale {
+  display: none;
+}
+

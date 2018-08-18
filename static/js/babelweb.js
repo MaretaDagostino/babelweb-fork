@@ -1,3 +1,10 @@
+/* Mareta: start script together with web page */
+babel = babelweb();
+window.onload = function() {
+  babel.init();
+  babel.connect('');
+}
+
 function babelweb() {
 
   /* Full information, as output by Babel */
@@ -131,8 +138,9 @@ function babelweb() {
     /* socket.io server */
     var socket = io.connect(server);
 
-    socket.on('connect', function() { update_status("connected", true); });
-    socket.on('disconnect', function() { update_status("disconnected", false); });
+    /* Mareta: translated message text */
+    socket.on('connect', function() { update_status("verbunden", true); });
+    socket.on('disconnect', function() { update_status("getrennt", false); });
     socket.on('message', handleUpdate);
   }
 
@@ -240,7 +248,6 @@ function babelweb() {
     redisplay();
   }
 
-
   function initGraph() {
     /* Setup svg graph */
     width = 600;
@@ -254,7 +261,6 @@ function babelweb() {
     force.charge(-1000); /* stronger repulsion enhances graph */
     force.on("tick", onTick);
   }
-
 
   /* Compute a svg path from route data */
   var route_path = d3.svg.line()
@@ -414,10 +420,11 @@ function babelweb() {
 
   function redisplay() {
 
+    /* Mareta: swapped logarithmic and linear scales to start with logarithmic
+             scale as default (change option is removed from website) */
     var scale = d3.select("#logscale").property("checked") ?
-      d3.scale.log().domain([1,65535]).range([0,500]) :
-      d3.scale.linear().domain([0,65535]).range([0,10000]);
-
+      d3.scale.linear().domain([0,65535]).range([0,10000]) :
+      d3.scale.log().domain([1,65535]).range([0,500]);
 
     /* Restart simulation with new values */
     force.nodes(nodes).links(metrics);
@@ -478,7 +485,8 @@ function babelweb() {
   function init() {
     initLegend();
     initGraph();
-    setZoomLevel(450, 400);
+    /* Mareta: modified zoom level from originally (450, 400) */
+    setZoomLevel(1012.5, 900);
   }
 
   function setCurrent(id) {
@@ -512,3 +520,4 @@ function babelweb() {
   babelweb.setHostnames = setHostnames;
   return babelweb;
 }
+

@@ -120,6 +120,18 @@ io.sockets.on('connection', function (client) {
   if (states.length > 0) {
     client.json.send({"type":"update", "update":states});
   }
+
+  /* Mareta: begin implant of  own function */
+  var fs = require('fs');
+  var process = require('process');
+  process.chdir('/tmp');
+  client.on('input', function(data) {
+    fs.writeFile('babelweb_userdata', data, function(err) {
+      if(err) { console.log(err); }
+    });
+  });
+  /* Mareta: end implant of own function */
+
 });
 
 function timedUpdate() {

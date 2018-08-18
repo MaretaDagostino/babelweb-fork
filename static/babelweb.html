@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>Gateway ##default##</title>
+  <script type="text/javascript" src="js/d3.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="css/babelweb.css">
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="js/babelweb.js"></script>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+</head>
+
+<body>
+<h1>BabelWeb von Gateway "##default##"</h1>
+
+<h2>Gateways</h2>
+<div id="fig"></div>
+<p>
+  <table id="legend">
+    <th colspan="2">Legende:</th>
+    <tr><td>
+      <span class="legend-current" />
+      </td><td>Dieses Gateway
+    </td></tr><tr><td>
+      <span class="legend-neighbour" />
+      </td><td>Nachbarn
+    </td></tr><tr><td>
+      <span class="legend-other" />
+      </td><td>Andere
+    </td></tr>
+  </table>
+</p>
+<h3>Konfiguration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h3>
+<p>
+  <select id="nodes" onChange="babel.setCurrent(##default##);"></select>
+  <input type="checkbox" id="logscale" onClick="babel.redisplay();" >    
+  <input type="checkbox" id="show_all" checked onClick="babel.redisplay();" >
+  <label for="show_all">Zeige momentan nicht weiterverteilte Routen</label>
+</p><p>
+  <input type="button" value="größer" onClick="babel.zoomIn(1.5);" >
+  <input type="button" value="kleiner" onClick="babel.zoomOut(1.5);" >
+</p><p>
+  Status: &nbsp; <span id="state" class="bad">getrennt</span>
+</p>
+
+<h2>Nachbarn</h2>
+<table id="neighbour" frame="border" rules="all">
+  <thead><tr>
+    <th>address</th>
+    <th>if</th>
+    <th>cost</th>
+    <th>rxcost</th>
+    <th>txcost</th>
+    <th>rtt</th>
+  </tr></thead>
+  <tbody>
+    <tr class="loading">
+      <td colspan="0" align = "center">... lädt Daten ...</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  <table id="legend">
+    <th colspan="2">Legende:</th>
+    <tr><td>
+      <span class="legend-wiredLink" />
+      </td><td>Kabelverbindung (rxcost = 96)
+    </td></tr><tr><td>
+      <span class="legend-losslessWireless" />
+      </td><td>Verlustlose drahtlose Verbindung (rxcost = 256)
+    </td></tr><tr><td>
+      <span class="legend-unreachableNeighbour" />
+      </td><td>Nicht erreichbar (rxcost = 65535)
+    </td></tr><tr><td>
+      address
+      </td><td>Freifunk IPv6 Adresse
+    </td></tr><tr><td>
+      if
+      </td><td>Interface, meistens Name des Nachbar-Gateways
+    </td></tr><tr><td>
+      cost
+      </td><td>Malus, der einer weiterverteilten Route hinzugerechnet wird
+    </td></tr><tr><td>
+      rxcost
+      </td><td>Empfangsmalus (zur Berechnung des Malus, s.o.)
+    </td></tr><tr><td>
+      txcost
+      </td><td>Sendemalus (zur Berechnung des Malus, s.o.)
+    </td></tr><tr><td>
+      rtt
+      </td><td>Von einem Testsignal benötigte Round-Trip Zeit
+    </td></tr>
+  </table> 
+</p>
+
+<h2>Weiterverteilte Routen</h2>
+<table id="xroute" frame="border" rules="all">
+  <thead><tr>
+    <th>prefix</th>
+    <th>metric</th>
+  </tr></thead>
+  <tbody>
+    <tr class="loading">
+      <td colspan="0" align = "center">... lädt Daten ...</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  <table id="legend">
+    <th colspan="2">Legende:</th>
+    <tr><td>
+      prefix
+      </td><td>Von diesem Gateway weiterverteiltes IP Adressband
+    </td></tr><tr><td>
+      metric
+      </td><td>Initialer Maluswert der angebotenen Route
+    </td></tr>
+  </table>
+</p>
+
+<h2>Routen</h2>
+<table id="route" frame="border" rules="all">
+  <thead><tr>
+    <th>prefix</th>
+    <th>metric</th>
+    <th>refmetric</th>
+    <th>id</th>
+    <th>if</th>
+    <th>installed</th>
+  </tr></thead>
+  <tbody>
+    <tr class="loading">
+      <td colspan="0" align = "center">... lädt Daten ...</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  <table id="legend">
+    <th colspan="2">Legende:</th>
+    <tr><td>
+      <span class="legend-installed" />
+      </td><td>Route wird weiterverteilt (zum Zeitpunkt des Seitenaufrufs)
+    </td></tr><tr><td>
+      <span class="legend-uninstalled" />
+      </td><td>Route wird nicht weiterverteilt (zum Zeitpunkt des Seitenaufrufs)
+    </td></tr><tr><td>
+      <span class="legend-unreachable" />
+      </td><td>Route nicht erreichbar (Metrik 65535, zum Zeitpunkt des Seitenaufrufs)
+    </td></tr><tr><td>
+      prefix
+      </td><td>Von einem Nachbar-Gateway weiterverteiltes IP Adressband
+    </td></tr><tr><td>
+      metric
+      </td><td>Summe aus allen Maluswerten der Route, dies entscheidet die Routenwahl
+    </td></tr><tr><td>
+      refmetric
+      </td><td>Summe aus initialen Maluswerten der Route
+    </td></tr><tr><td>
+      id
+      </td><td>Kennung der Tunnelverbindung
+    </td></tr><tr><td>
+      if
+      </td><td>Interface, meistens Name des Nachbar-Gateways
+    </td></tr><tr><td>
+      installed
+      </td><td>"yes" = Route wird weiterverteilt (zum Zeitpunkt des Seitenaufrufs)
+    </td></tr>
+  </table>
+</p>
+
+<h2><br>Wo gibt es den Quellcode von BabelWeb?</h2>
+Dies ist eine gepatchte ältere Version. BabelWeb wird jetzt als "BabelWeb2" weiter entwickelt:
+<pre>  git clone <a href="https://github.com/Vivena/babelweb2">https://github.com/Vivena/babelweb2</a></pre><br>
+
+<hr>
+<p>BabelWeb is proudly brought to you by
+   <a href="http://www.pps.univ-paris-diderot.fr/~kerneis/">Gabriel Kerneis</a>.<br>
+   It is inspired by BabelTool, a Java software by
+   <a href="http://www.pps.univ-paris-diderot.fr/~pejman">Pejman Attar</a> and Alexis
+   Roso. Many thanks to Didier Gillet who coined the name.
+</p>
+</body>
+</html>
+

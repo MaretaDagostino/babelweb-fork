@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>Emergency Reboot</title>
+  <script type="text/javascript"src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    socket = io.connect();
+    socket.on('input', function(data) { });
+    function mouseclick(button_id) {
+      socket.emit('input', button_id + ";" + document.getElementById("input").value);
+    }
+    function dummyclick(button_id) { }; /* catch obsolete default selection */
+  </script>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+      min-width: 40em;
+      max-width: 55em;
+      color: black;
+      background-color: white;
+      text-align: left;
+    }
+    button {
+      background-color: #e1e1e1;
+      border-color: #a9a9a9;
+      border-style: outset;
+    }
+    button:hover {
+      background-color: #a6f4ff;
+      border-color: #26a0da;
+      border-style: inset;
+    }
+    input {
+      border-style: solid;
+      border-color: gray;
+    }
+    input:hover {
+      border-color: #12506d;
+      background-color: #a6f4ff;
+    }
+    p {
+      text-align: justify;
+    }
+    /* catch obsolete default selection */
+    button[id="dummy"] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <p><form>
+    <label>Notabschaltung: &nbsp; </label>
+    <input type="text" id="input" size="25" value="Passwort"> &nbsp;
+    <button type="button" id="dummy" name="" onclick="dummyclick();"></button>
+    <button type="button" name="restart" onclick="mouseclick('R');">Restart</button> &nbsp;
+    <button type="button" name="shutdown" onclick="mouseclick('S');">Shutdown</button>
+  </form></p>
+</body>
+</html>
+

@@ -1,117 +1,128 @@
-Babelweb -- Monitoring tool for the Babel routing daemon
-==========================================================
+Fork von Babelweb -- Monitoring-Tool für den Babel Routing Dienst
+=================================================================
 
-Quick start  (from search.npmjs.org)
------------
+Dies ist eine textlich für Freifunk-Franken-Gateways angepasste
+und ins Deutsche übersetzte Version von BabelWeb 0.4.0.
 
-Install and start the latest babelweb release:
+Hinweis: In der Originaldokumentation wird als Kontaktadresse Gabriel Kerneis
+angegeben. Dies ist nicht mehr korrekt, weil er die Entwicklung von BabelWeb
+und ebenso den Support dafür eingestellt hat! Es gibt ein neues Team, welches
+eine Nachfolgeversion entwickelt: https://github.com/Vivena/babelweb2
+
+
+Installation (hier für Debian 9 beschrieben)
+------------
+
+Eine vollwertige Version von nodejs wird in Debian 9 nicht mehr angeboten,
+weshalb es aus der Originalquelle installiert werden muss.
+
+    apt-get install curl
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    apt-get install nodejs
+
+Nun wird das originale BabelWeb 0.4.0 aus NPM installiert.
 
     npm install -g babelweb
-    babeld -g 33123 ... &
-    babelweb
+    npm update -g
 
-Browse http://localhost:8080/.
+Um Verwechslungen zu vermeiden, sollte das Original-Verzeichnis "static"
+vor dem Installieren des Forks gelöscht oder umbenannt werden.
+Das originale README.md kann umbenannt werden, wenn es vom Fork nicht
+überschrieben werden soll.
 
-Detailed instructions (from git repository or archive)
----------------------
+Der Fork besteht aus 12 Dateien und liegt auf Github:
+https://github.com/MaretaDagostino/babelweb-fork
 
-You'll need Node.js (>= 0.10.0) and npm (provided with nodejs).  If you have not
-installed them yet, [download Node.js](http://nodejs.org/download/) for your
-platform.
+    node_modules/policyfile/lib/server.js
+    server.js
+    README.md
+    AUTHORS   (nur Namen ergänzt)
+    LICENSE   (nur Namen ergänzt)
+    LICENSE.d3   (nur aktualisiert)
+    static/babelweb.html
+    static/emergency.html.example  (Beispiel für optionale Zusatzfunktion)
+    static/js/babelweb.js
+    static/js/d3.js   (nur aktualisiert)
+    static/js/d3.min.js   (nur aktualisiert)
+    static/css/babelweb.css
 
-Clone the repository if you haven't already, and cd into it:
+Diese Dateien werden ins BabelWeb-Verzeichnis bzw. Unterverzeichnisse wie oben
+kopiert. BabelWeb ist meistens dort zu finden (bitte auf dem Rechner prüfen):
 
-    git clone git://git.wifi.pps.univ-paris-diderot.fr/babelweb.git
-    cd babelweb
-
-You have then two options to install babelweb:
-
-1. Install babelweb globally (in /usr/local by default), with its dependencies:
-
-        make install
-
-2. Keep babelweb in the current directory, install dependencies locally, and
-   add a global symlink (in /usr/local by default):
-
-        make link
-
-If you want to install it once and forget about it, I recommend method 1; if
-you want to track development easily, method 2.  If you change your mind, run
-`make uninstall` (for any of the methods).
-
-Then, start Babel on your local host:
-
-    babeld -g 33123 ... &
-
-And finally start babelweb:
-
-    babelweb
-
-By default, the babelweb interface is located at:
-http://localhost:8080/
+    /usr/lib/node_modules/babelweb
 
 
-Monitoring remote babel instances
----------------------------------
+Konfiguration (hier für Debian 9 beschrieben)
+-------------
 
-To monitor a remote babel instance (eg. running on a host called `remote`), you
-have two options.
+Als Voraussetzung für BabelWeb muss der Babel Routing Dienst
+auf Port 33123 laufen, BabelWeb ist nur ein Anzeigetool.
 
-1. Create a tunnel from `remote` to `local` with ssh:
+Babelweb kann als Dienst gestartet werden, sollte aber mit einem Account ohne
+Rootrechte laufen (hier "nobody"). Außerdem wurde das Update-Intervall hier
+auf eine Stunde gesetzt, weil das Gezappel der Grafik einfach nur nervt.
 
-        local$ ssh -N -L[::1]:33123:[::1]:33123 username@remote
+    > vi /etc/systemd/system/babelweb.service
 
-   and keep the default value for the option `routers`.
+    [Unit]
+    Description=Fork of BabelWeb
+    [Service]
+    ExecStart=/usr/bin/node /usr/lib/node_modules/babelweb/server.js port=8080 update=3600000
+    User=nobody
+    Type=simple
+    [Install]
+    WantedBy=multi-user.target
 
-2. Use `socat` as a proxy on `remote` to make the babel local interface
-   available from the outside:
+    > systemctl enable babelweb
+    > systemctl start babelweb.service
+    
+Kontrolle:
 
-        remote$ socat TCP-LISTEN:1234,fork TCP6:[::1]:33123
+    > systemctl status babelweb.service
 
-   and setup the option `routers` accordingly:
-   
-        local$ babelweb routers="remote:1234"
+Aufruf im Browser zur Kontrolle (Portnummer wie beim Start angegeben):
+
+    > http://<IP-Adresse oder Domain>:8080/babelweb.html
+
+In der Datei "static/babelweb.html" muss an drei Stellen der Name des
+Gateways angepasst werden, dort steht als Platzhalter "##default##".
+Siehe dort folgende Zeilen: 5, 8 und 36
 
 
-Options
--------
+Extras
+------
 
-See the man page for a list of options (also available in the doc/ directory):
+1) BabelWeb enthält einen einfachen Webserver, der statische Webseiten
+   anzeigen kann. Die Einstiegsseite muss "index.htm" oder "index.html"
+   heißen. Das Wurzelverzeichnis für Webseiten ist "static".
+   Wer keine eigene Einstiegsseite gestalten möchte, kann die Datei
+   "static/babelweb.html" entsprechend umbenennen.
 
-    man babelweb
+2) Systemports < 1024 sind defaultmäßig auf Linux-Rechnern nur Accounts
+   mit Root-Rechten zugänglich. BabelWeb sollte aus Sicherheitsgründen
+   nicht als Root laufen.
+   Es gibt aber eine Möglichkeit, die Systemports und damit auch Port 80
+   für ein bestimmtes Programm explizit freizugeben. Benötigt wird das
+   Paket "libcap2-bin".
 
-You can specify options directly on the command-line:
+     > apt-get install libcap2-bin
 
-    babelweb port=80 host=127.0.0.1
+   Dann muss das folgende Kommando bei jedem Systemstart vor dem Start
+   von BabelWeb ausgeführt werden:
 
-Alternatively, you can manage babelweb options through npm:
+     > setcap 'cap_net_bind_service=+ep' /usr/bin/node
 
-    npm config set babelweb:port 80
+   Hinweis: Babelweb kann nicht auf Port 80 arbeiten, wenn dort bereits
+   ein anderer Webserver (z.B. Apache oder Nginx) läuft.
 
-In that case, you **must** start babelweb through npm too (and cannot use
-command-line options):
+3) Dieser Fork enthält eine optionale Zusatzfunktion, womit Texte aus dem
+   Webbrowser auf den Server übertragen werden können. Die empfangenen
+   Texte werden in der Datei "/tmp/babelweb_userdata" abgespeichert
+   und können dort von anderen Programmen weiterverarbeitet werden.
 
-    npm start -g babelweb
+   Jeder neu übertragene Text überschreibt den vorhandenen, dabei wird
+   nicht zwischen verschiedenen Anwendern unterschieden.
 
-See `man npm-config` for more details.
+   "static/emergency.html.example" ist ein funktionsfähiges Beispiel,
+   wenn die Endung ".example" entfernt wird.
 
-Security
---------
- 
-Babelweb does not need to be started as root anymore; regular user privileges
-are recommended.
-
-Browser support
----------------
-
-Babelweb needs a browser supporting javascript (to fetch remote data)
-and SVG (to display the network graph).  If Adobe Flash is installed, it
-might be used to establish a more reliable connection (but websockets
-are prefered if your browser supports them).
-
-Babelweb has been tested and found to work with recent versions of Firefox,
-Chrome, Safari and Opera (except for some visual bells and whistles).
-
-Please, do not hesitate to send reports of working and broken browsers.
-
-Gabriel Kerneis <kerneis@pps.univ-paris-diderot.fr>
